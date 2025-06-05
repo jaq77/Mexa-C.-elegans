@@ -1,0 +1,23 @@
+# For creating a Volcano plot from my results(dds)
+
+tab <- data.frame(logFC = res_AvM$log2FoldChange, negLogPval = -log10(res_AvM$padj))   # Uses "log2FoldChange" and "padj" columns
+
+# Define thresholds
+lfc <- 2                 # log fold change threshold
+padj <- 0.05             # padj threshold
+
+# Identify significant genes based on thresholds
+signGenesUp <- tab$logFC > lfc & tab$negLogPval > -log10(padj)          # Up-regulated
+signGenesDown <- tab$logFC < -lfc & tab$negLogPval > -log10(padj)       # Down-regulated
+signGenesNS <- abs(tab$logFC) <= lfc | tab$negLogPval <= -log10(padj)   # Not significant
+
+# Create the plot
+plot(tab, pch = 16, cex = 0.6, xlab = expression(log[2]("Fold Change")), ylab = expression(-log[10]("padj")), col = ifelse(signGenesNS, "black", ifelse(tab$logFC > 0, "red", "blue")), cex.lab = 1.5, ylim = c(0, 115))
+abline(h = -log10(padj), col = "green3", lty = 2)
+abline(v = c(-lfc, lfc), col = "blue", lty = 2)
+text(x = c(-lfc -1.7), y = 115, paste("-", lfc, "fold"), cex = 0.8)
+text(x = c(lfc +1.7), y = 115, paste("+", lfc, "fold"), cex = 0.8)
+text(x = 9, y = -1.5, paste("padj =", padj), cex = 0.8)
+text(x = -7.5, y = 100, labels = paste(nrow(down_AvM_lfc), "DOWN"))
+text(x = 7, y = 100, labels = paste(nrow(up_AvM_lfc), "UP"))
+title("Mexican vs N2 Ancestral", cex.main = 2)
